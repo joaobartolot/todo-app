@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_firebase/index.dart';
+import 'package:todo_firebase/page/home_page.dart';
 import 'package:todo_firebase/page/login_page.dart';
 
 void main() => runApp(MyApp());
@@ -15,10 +16,11 @@ class MyApp extends StatelessWidget {
         accentColor: Color(0xff37487C),
         fontFamily: '.SF Pro Display',
       ),
-      initialRoute: '/login',
+      initialRoute: '/',
       routes: {
         '/': (context) => Index(),
         '/login': (context) => LoginPage(),
+        '/home': (context) => HomePage(),
       },
     );
   }

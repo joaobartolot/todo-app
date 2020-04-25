@@ -1,5 +1,10 @@
+import 'package:dartz/dartz.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+import 'package:todo_firebase/provider/login_provider.dart';
+import 'package:todo_firebase/util/failure.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({Key key}) : super(key: key);
@@ -25,12 +30,16 @@ class LoginPage extends StatelessWidget {
                     children: <Widget>[
                       Container(
                         height: 250,
-                        child: SvgPicture.asset('assets/to_do.svg'),
+                        child: Image(image: AssetImage('assets/to_do.png')),
                       ),
                       SizedBox(height: 40.0),
-                      LoginForm(
+                      ChangeNotifierProvider<LoginProvider>(
+                        create: (context) => LoginProvider(),
+                        child: LoginForm(
                           focusPassword: _focusPassword,
-                          focusEmail: _focusEmail),
+                          focusEmail: _focusEmail,
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -57,10 +66,16 @@ class LoginForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController _email = TextEditingController();
+    final TextEditingController _password = TextEditingController();
+
+    final state = Provider.of<LoginProvider>(context);
+
     return Form(
       child: Column(
         children: <Widget>[
           TextField(
+            controller: _email,
             obscureText: false,
             textInputAction: TextInputAction.next,
             onSubmitted: (_) =>
@@ -81,6 +96,7 @@ class LoginForm extends StatelessWidget {
           ),
           SizedBox(height: 20.0),
           TextField(
+            controller: _password,
             obscureText: true,
             onSubmitted: (_) => FocusScope.of(context).unfocus(),
             focusNode: _focusPassword,
@@ -100,27 +116,50 @@ class LoginForm extends StatelessWidget {
           SizedBox(height: 10.0),
           Flex(
             direction: Axis.horizontal,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Radio(
-                    value: null,
-                    groupValue: null,
-                    onChanged: (value) => print('implement'),
-                    activeColor: Theme.of(context).primaryColor,
-                  ),
-                  Text('Remember-me')
-                ],
-              ),
+              // Row(
+              //   children: <Widget>[
+              //     Checkbox(
+              //       value: state.rememberMe,
+              //       onChanged: (value) {
+              //         state.rememberMe = value;
+              //       },
+              //       activeColor: Theme.of(context).primaryColor,
+              //     ),
+              //     GestureDetector(
+              //       child: Text('Remember-me'),
+              //       onTap: () => state.rememberMe = !state.rememberMe,
+              //     )
+              //   ],
+              // ),
               RaisedButton(
                 color: Theme.of(context).primaryColor,
                 padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 10.0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(7.0),
                 ),
-                onPressed: () =>
-                    FocusScope.of(context).requestFocus(FocusNode()),
+                onPressed: () async {
+                  FocusScope.of(context).requestFocus(FocusNode());
+                  Either<Failure, FirebaseUser> result =
+                      await state.authenticateUser(_email.text, _password.text);
+                  if (result.isLeft()) {
+                    var l = Left(result).value;
+                    showDialog(
+                        context: context,
+                        child: AlertDialog(
+                          title: Text('Error'),
+                          actions: <Widget>[
+                            FlatButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: Text('Ok'),
+                            ),
+                          ],
+                        ));
+                  } else {
+                    Navigator.pushReplacementNamed(context, '/home');
+                  }
+                },
                 child: Text(
                   'Login',
                   style: TextStyle(
