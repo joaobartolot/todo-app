@@ -12,7 +12,7 @@ class AuthService {
       String email, String password) async {
     AuthResult result;
     try {
-      await _firebaseAuth.signInWithEmailAndPassword(
+      result = await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );

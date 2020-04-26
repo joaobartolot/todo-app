@@ -16,22 +16,25 @@ class _HomePageState extends State<HomePage> {
         child: Stack(
           children: <Widget>[
             Align(
-                alignment: Alignment.topCenter,
-                child: Container(
-                  height: 60.0,
-                  color: Colors.grey[100],
-                  child: Row(
-                    children: <Widget>[
-                      IconButton(
-                        icon: Icon(FontAwesomeIcons.signOutAlt),
-                        onPressed: () {
-                          UserHelper.setUserUid('');
-                          Navigator.pushReplacementNamed(context, '/login');
-                        },
-                      )
-                    ],
-                  ),
-                )),
+              alignment: Alignment.topCenter,
+              child: Container(
+                height: 60.0,
+                color: Colors.grey[100],
+                child: Flex(
+                  direction: Axis.horizontal,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    IconButton(
+                      icon: Icon(FontAwesomeIcons.signOutAlt),
+                      onPressed: () {
+                        UserHelper.setUserUid('');
+                        Navigator.pushReplacementNamed(context, '/login');
+                      },
+                    )
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
