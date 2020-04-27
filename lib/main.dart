@@ -15,6 +15,10 @@ class MyApp extends StatelessWidget {
         primaryColor: Color(0xff4C78FF),
         accentColor: Color(0xff37487C),
         fontFamily: '.SF Pro Display',
+        textTheme: Theme.of(context).textTheme.apply(
+              bodyColor: Color(0xff37487C),
+              displayColor: Color(0xff37487C),
+            ),
       ),
       initialRoute: '/',
       routes: {

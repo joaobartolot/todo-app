@@ -89,7 +89,7 @@ class LoginForm extends StatelessWidget {
                 vertical: 10.0,
                 horizontal: 20.0,
               ),
-              prefixIcon: Icon(Icons.email),
+              prefixIcon: Icon(Icons.alternate_email),
               hasFloatingPlaceholder: true,
               labelText: 'Email',
             ),
@@ -143,22 +143,23 @@ class LoginForm extends StatelessWidget {
                   FocusScope.of(context).requestFocus(FocusNode());
                   Either<Failure, FirebaseUser> result =
                       await state.authenticateUser(_email.text, _password.text);
-                  if (result.isLeft()) {
-                    var l = Left(result).value;
-                    showDialog(
-                        context: context,
-                        child: AlertDialog(
-                          title: Text('Error'),
-                          actions: <Widget>[
-                            FlatButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              child: Text('Ok'),
-                            ),
-                          ],
-                        ));
-                  } else {
-                    Navigator.pushReplacementNamed(context, '/home');
-                  }
+                  result.fold(
+                    (error) => showDialog(
+                      context: context,
+                      child: AlertDialog(
+                        title: Text('Error 😯'),
+                        content: Text(error.mensage),
+                        actions: <Widget>[
+                          FlatButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Text('Ok'),
+                          ),
+                        ],
+                      ),
+                    ),
+                    (success) =>
+                        Navigator.pushReplacementNamed(context, '/home'),
+                  );
                 },
                 child: Text(
                   'Login',
