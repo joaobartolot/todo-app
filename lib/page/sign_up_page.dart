@@ -1,67 +1,34 @@
 import 'package:dartz/dartz.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:todo_firebase/provider/login_provider.dart';
+import 'package:todo_firebase/provider/sign_up_provider.dart';
 import 'package:todo_firebase/util/failure.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({Key key}) : super(key: key);
+class SignUpPage extends StatelessWidget {
+  const SignUpPage({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final FocusNode _focusEmail = FocusNode();
-    final FocusNode _focusPassword = FocusNode();
-
-    return Padding(
-      padding: const EdgeInsets.only(left: 30.0, right: 30.0, top: 40.0),
-      child: Center(
-        child: Flex(
-          direction: Axis.vertical,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Column(
-              children: <Widget>[
-                Container(
-                  height: 250,
-                  child: Image(image: AssetImage('assets/to_do.png')),
-                ),
-                SizedBox(height: 40.0),
-                ChangeNotifierProvider<LoginProvider>(
-                  create: (context) => LoginProvider(),
-                  child: LoginForm(
-                    focusPassword: _focusPassword,
-                    focusEmail: _focusEmail,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+    return ChangeNotifierProvider(
+      create: (context) => SignUpProvider(),
+      child: Container(
+        child: SignUpForm(),
       ),
     );
   }
 }
 
-class LoginForm extends StatelessWidget {
-  const LoginForm({
-    Key key,
-    @required FocusNode focusPassword,
-    @required FocusNode focusEmail,
-  })  : _focusPassword = focusPassword,
-        _focusEmail = focusEmail,
-        super(key: key);
-
-  final FocusNode _focusPassword;
-  final FocusNode _focusEmail;
+class SignUpForm extends StatelessWidget {
+  const SignUpForm({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final TextEditingController _email = TextEditingController();
     final TextEditingController _password = TextEditingController();
+    final FocusNode _focusEmail = FocusNode();
+    final FocusNode _focusPassword = FocusNode();
 
-    final state = Provider.of<LoginProvider>(context);
+    final provider = Provider.of<SignUpProvider>(context);
 
     return Form(
       child: Column(
@@ -133,25 +100,25 @@ class LoginForm extends StatelessWidget {
                 ),
                 onPressed: () async {
                   FocusScope.of(context).requestFocus(FocusNode());
-                  Either<Failure, FirebaseUser> result =
-                      await state.authenticateUser(_email.text, _password.text);
-                  result.fold(
-                    (error) => showDialog(
-                      context: context,
-                      child: AlertDialog(
-                        title: Text('Error 😯'),
-                        content: Text(error.mensage),
-                        actions: <Widget>[
-                          FlatButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            child: Text('Ok'),
-                          ),
-                        ],
-                      ),
-                    ),
-                    (success) =>
-                        Navigator.pushReplacementNamed(context, '/home'),
-                  );
+                  // Either<Failure, FirebaseUser> result = await provider
+                  //     .createuser(_email.text, _password.text, '');
+                  // result.fold(
+                  //   (error) => showDialog(
+                  //     context: context,
+                  //     child: AlertDialog(
+                  //       title: Text('Error 😯'),
+                  //       content: Text(error.mensage),
+                  //       actions: <Widget>[
+                  //         FlatButton(
+                  //           onPressed: () => Navigator.of(context).pop(),
+                  //           child: Text('Ok'),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  //   (success) =>
+                  //       Navigator.pushReplacementNamed(context, '/home'),
+                  // );
                 },
                 child: Text(
                   'Login',

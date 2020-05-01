@@ -18,7 +18,7 @@ class _IndexState extends State<Index> {
         if (isLogged) {
           Navigator.pushReplacementNamed(context, '/home');
         } else
-          Navigator.pushReplacementNamed(context, '/login');
+          Navigator.pushReplacementNamed(context, '/login-signup');
       },
     );
   }
