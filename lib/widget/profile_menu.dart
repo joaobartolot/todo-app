@@ -1,10 +1,15 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:todo_firebase/helper/user_helper.dart';
 
 class ProfileMenu extends StatelessWidget {
+  final String name;
+  final String email;
   const ProfileMenu({
     Key key,
+    this.name,
+    this.email,
   }) : super(key: key);
 
   @override
@@ -17,43 +22,44 @@ class ProfileMenu extends StatelessWidget {
           vertical: 30.0,
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
               child: Column(
                 children: [
                   Text(
-                    'Megan Maddison',
+                    name,
                     style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   SizedBox(height: 5.0),
-                  Text('meganmaddison@gmail.com'),
+                  Text(email),
                 ],
               ),
             ),
             SizedBox(height: 25.0),
-            GestureDetector(
-              onTap: () => print('implement'),
-              child: Row(
-                children: <Widget>[
-                  Icon(
-                    FontAwesomeIcons.addressCard,
-                    color: Theme.of(context).accentColor,
-                    size: 18.0,
-                  ),
-                  SizedBox(width: 15.0),
-                  Text('Profile'),
-                ],
-              ),
-            ),
-            SizedBox(height: 15.0),
+            // GestureDetector(
+            //   onTap: () => print('implement'),
+            //   child: Row(
+            //     children: <Widget>[
+            //       Icon(
+            //         FontAwesomeIcons.addressCard,
+            //         color: Theme.of(context).accentColor,
+            //         size: 18.0,
+            //       ),
+            //       SizedBox(width: 15.0),
+            //       Text('Profile'),
+            //     ],
+            //   ),
+            // ),
+            // SizedBox(height: 15.0),
             GestureDetector(
               onTap: () {
                 UserHelper.setUserUid('');
+                FirebaseAuth.instance.signOut();
                 Navigator.pushReplacementNamed(context, '/login');
               },
               child: Row(

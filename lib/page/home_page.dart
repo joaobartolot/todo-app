@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_firebase/model/task_model.dart';
@@ -17,7 +18,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-
     _controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 200));
   }
@@ -26,31 +26,28 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<HomeProvider>(
       create: (context) => HomeProvider(),
-      child: GestureDetector(
-        onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
-        child: Scaffold(
-          body: SafeArea(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 30.0),
-              child: Stack(
-                children: <Widget>[
-                  Align(
-                    alignment: Alignment.topCenter,
-                    child: TaskAppBar(
-                      controller: _controller,
-                    ),
-                  ),
-                  Positioned(
-                    top: 75.0,
-                    width: MediaQuery.of(context).size.width - 60.0,
-                    height: MediaQuery.of(context).size.height - 75.0,
-                    child: Flex(
-                      direction: Axis.vertical,
-                      children: <Widget>[
-                        SizedBox(height: 50.0),
-                        NewTask(),
-                        Consumer<HomeProvider>(
-                          builder: (context, provider, _) => Expanded(
+      child: Consumer<HomeProvider>(
+        builder: (context, provider, _) => GestureDetector(
+          onTap: () {
+            FocusScope.of(context).requestFocus(FocusNode());
+            if (!provider.isCollapsed) provider.animateProfileMenu(_controller);
+          },
+          child: Scaffold(
+            body: SafeArea(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 30.0),
+                child: Stack(
+                  children: <Widget>[
+                    Positioned(
+                      top: 75.0,
+                      width: MediaQuery.of(context).size.width - 60.0,
+                      height: MediaQuery.of(context).size.height - 75.0,
+                      child: Flex(
+                        direction: Axis.vertical,
+                        children: <Widget>[
+                          SizedBox(height: 50.0),
+                          NewTask(),
+                          Expanded(
                             flex: 1,
                             child: FutureBuilder(
                               future: provider.taskList(),
@@ -59,68 +56,113 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                       stream: stream.data,
                                       builder: (context, snapshot) {
                                         if (!snapshot.hasData)
-                                          return Container(
-                                            child: CircularProgressIndicator(
-                                              valueColor:
-                                                  AlwaysStoppedAnimation<Color>(
-                                                      Theme.of(context)
-                                                          .primaryColor),
+                                          return Center(
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                CircularProgressIndicator(
+                                                  valueColor:
+                                                      AlwaysStoppedAnimation<
+                                                              Color>(
+                                                          Theme.of(context)
+                                                              .primaryColor),
+                                                ),
+                                              ],
                                             ),
                                           );
 
                                         var taskList = snapshot.data.documents;
-
-                                        return ListView.builder(
-                                          itemCount: taskList.length,
-                                          itemBuilder: (context, index) =>
-                                              Container(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width -
-                                                60.0,
-                                            child: Row(
+                                        if (snapshot.data.documents.length == 0)
+                                          return Center(
+                                            child: Column(
                                               children: <Widget>[
-                                                Checkbox(
-                                                  value: taskList[index]
-                                                      .data['isDone'],
-                                                  onChanged: (value) {
-                                                    print('implement');
-                                                    // provider.toggleTodo(
-                                                    //     taskList[index].data);
-                                                  },
+                                                Icon(
+                                                  Icons.info_outline,
+                                                  size: 40.0,
+                                                ),
+                                                SizedBox(height: 10.0),
+                                                Text(
+                                                  "Looks like you don't have any task 😕.",
+                                                  style:
+                                                      TextStyle(fontSize: 20.0),
                                                 ),
                                                 Text(
-                                                  taskList[index].data['text'],
-                                                  style: taskList[index]
-                                                          .data['isDone']
-                                                      ? TextStyle(
-                                                          decoration:
-                                                              TextDecoration
-                                                                  .lineThrough)
-                                                      : null,
-                                                ),
+                                                    "you can add a new task by taping in the + icon."),
                                               ],
+                                            ),
+                                          );
+                                        return Expanded(
+                                          flex: 1,
+                                          child: ListView.builder(
+                                            itemCount: taskList.length,
+                                            itemBuilder: (context, index) =>
+                                                Container(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width -
+                                                  60.0,
+                                              child: Row(
+                                                children: <Widget>[
+                                                  Checkbox(
+                                                    value: taskList[index]
+                                                        .data['isDone'],
+                                                    onChanged: (value) {
+                                                      print('implement');
+                                                      // provider.toggleTodo(
+                                                      //     taskList[index].data);
+                                                    },
+                                                  ),
+                                                  Text(
+                                                    taskList[index]
+                                                        .data['text'],
+                                                    style: taskList[index]
+                                                            .data['isDone']
+                                                        ? TextStyle(
+                                                            decoration:
+                                                                TextDecoration
+                                                                    .lineThrough)
+                                                        : null,
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         );
-                                      })
+                                      },
+                                    )
                                   : null,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Consumer<HomeProvider>(
-                    builder: (context, provider, _) => Positioned(
-                      top: 75.0,
-                      child: SizeTransition(
-                        sizeFactor: _controller,
-                        child: ProfileMenu(),
+                        ],
                       ),
                     ),
-                  ),
-                ],
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child: StreamBuilder(
+                        stream: FirebaseAuth.instance.currentUser().asStream(),
+                        builder: (context, snapshot) => snapshot.hasData
+                            ? Column(
+                                children: <Widget>[
+                                  TaskAppBar(
+                                    controller: _controller,
+                                    photoUrl: '',
+                                    name: snapshot.data.displayName,
+                                  ),
+                                  SizeTransition(
+                                    sizeFactor: _controller,
+                                    child: ProfileMenu(
+                                      name: snapshot.data.displayName,
+                                      email: snapshot.data.email,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : null,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
