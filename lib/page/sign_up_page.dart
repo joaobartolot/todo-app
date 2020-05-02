@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_firebase/provider/sign_up_provider.dart';
@@ -168,25 +169,30 @@ class SignUpForm extends StatelessWidget {
                 ),
                 onPressed: () async {
                   FocusScope.of(context).requestFocus(FocusNode());
-                  // Either<Failure, FirebaseUser> result = await provider
-                  //     .createuser(_email.text, _password.text, '');
-                  // result.fold(
-                  //   (error) => showDialog(
-                  //     context: context,
-                  //     child: AlertDialog(
-                  //       title: Text('Error 😯'),
-                  //       content: Text(error.mensage),
-                  //       actions: <Widget>[
-                  //         FlatButton(
-                  //           onPressed: () => Navigator.of(context).pop(),
-                  //           child: Text('Ok'),
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
-                  //   (success) =>
-                  //       Navigator.pushReplacementNamed(context, '/home'),
-                  // );
+                  Either<Failure, FirebaseUser> result =
+                      await provider.createUser(
+                    name: _name.text,
+                    email: _email.text,
+                    password: _password.text,
+                    photoUrl: '',
+                  );
+                  result.fold(
+                    (error) => showDialog(
+                      context: context,
+                      child: AlertDialog(
+                        title: Text('Error 😯'),
+                        content: Text(error.mensage),
+                        actions: <Widget>[
+                          FlatButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Text('Ok'),
+                          ),
+                        ],
+                      ),
+                    ),
+                    (success) =>
+                        Navigator.pushReplacementNamed(context, '/home'),
+                  );
                 },
                 child: Text(
                   'Sign up',
