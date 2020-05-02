@@ -11,8 +11,19 @@ class SignUpPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => SignUpProvider(),
-      child: Container(
-        child: SignUpForm(),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 30.0, right: 30.0, top: 10.0),
+        child: Flex(
+          direction: Axis.vertical,
+          children: [
+            Container(
+              height: 250,
+              child: Image(image: AssetImage('assets/to_do_signup.png')),
+            ),
+            SizedBox(height: 25.0),
+            SignUpForm(),
+          ],
+        ),
       ),
     );
   }
@@ -23,16 +34,41 @@ class SignUpForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController _name = TextEditingController();
     final TextEditingController _email = TextEditingController();
     final TextEditingController _password = TextEditingController();
+    final TextEditingController _confirmation = TextEditingController();
+    final FocusNode _focusName = FocusNode();
     final FocusNode _focusEmail = FocusNode();
     final FocusNode _focusPassword = FocusNode();
+    final FocusNode _focusConfirmation = FocusNode();
 
     final provider = Provider.of<SignUpProvider>(context);
 
     return Form(
       child: Column(
         children: <Widget>[
+          TextField(
+            controller: _name,
+            obscureText: false,
+            textInputAction: TextInputAction.next,
+            onSubmitted: (_) =>
+                FocusScope.of(context).requestFocus(_focusEmail),
+            focusNode: _focusName,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              ),
+              contentPadding: EdgeInsets.symmetric(
+                vertical: 10.0,
+                horizontal: 20.0,
+              ),
+              prefixIcon: Icon(Icons.person),
+              hasFloatingPlaceholder: true,
+              labelText: 'Name',
+            ),
+          ),
+          SizedBox(height: 20.0),
           TextField(
             controller: _email,
             obscureText: false,
@@ -54,25 +90,57 @@ class SignUpForm extends StatelessWidget {
             ),
           ),
           SizedBox(height: 20.0),
-          TextField(
-            controller: _password,
-            obscureText: true,
-            onSubmitted: (_) => FocusScope.of(context).unfocus(),
-            focusNode: _focusPassword,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+          Flex(
+            direction: Axis.horizontal,
+            children: <Widget>[
+              Expanded(
+                flex: 1,
+                child: TextField(
+                  controller: _password,
+                  obscureText: true,
+                  textInputAction: TextInputAction.next,
+                  onSubmitted: (_) =>
+                      FocusScope.of(context).requestFocus(_focusConfirmation),
+                  focusNode: _focusPassword,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 10.0,
+                      horizontal: 20.0,
+                    ),
+                    prefixIcon: Icon(Icons.lock),
+                    hasFloatingPlaceholder: true,
+                    labelText: 'Password',
+                  ),
+                ),
               ),
-              contentPadding: EdgeInsets.symmetric(
-                vertical: 10.0,
-                horizontal: 20.0,
+              SizedBox(width: 10.0),
+              Expanded(
+                flex: 1,
+                child: TextField(
+                  controller: _confirmation,
+                  obscureText: true,
+                  onSubmitted: (_) => FocusScope.of(context).unfocus(),
+                  focusNode: _focusConfirmation,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    ),
+                    contentPadding: EdgeInsets.only(
+                      top: 10.0,
+                      bottom: 10.0,
+                      left: 20.0,
+                    ),
+                    hasFloatingPlaceholder: true,
+                    labelText: 'Confirmation',
+                  ),
+                ),
               ),
-              prefixIcon: Icon(Icons.lock),
-              hasFloatingPlaceholder: true,
-              labelText: 'Password',
-            ),
+            ],
           ),
-          SizedBox(height: 10.0),
+          SizedBox(height: 20.0),
           Flex(
             direction: Axis.horizontal,
             mainAxisAlignment: MainAxisAlignment.end,
@@ -121,7 +189,7 @@ class SignUpForm extends StatelessWidget {
                   // );
                 },
                 child: Text(
-                  'Login',
+                  'Sign up',
                   style: TextStyle(
                     color: Colors.white,
                   ),

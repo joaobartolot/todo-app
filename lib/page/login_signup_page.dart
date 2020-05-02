@@ -41,10 +41,38 @@ class LoginSignUpPage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SizedBox(height: 30.0),
+                  SizedBox(height: 20.0),
                 ],
               ),
-              SignUpPage(),
+              Flex(
+                direction: Axis.vertical,
+                children: <Widget>[
+                  SizedBox(height: 20.0),
+                  GestureDetector(
+                    onTap: () => _pageController.animateToPage(
+                      0,
+                      duration: Duration(milliseconds: 300),
+                      curve: Curves.easeInOutCubic,
+                    ),
+                    child: Column(
+                      children: <Widget>[
+                        Icon(
+                          Icons.keyboard_arrow_up,
+                          color: Theme.of(context).accentColor,
+                        ),
+                        Text(
+                          'Login',
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(child: SignUpPage()),
+                ],
+              ),
             ],
           ),
         ),
