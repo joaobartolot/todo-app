@@ -1,4 +1,4 @@
-import 'package:dartz/dartz.dart';
+import 'package:dartz/dartz.dart' as dartz;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -30,30 +30,49 @@ class SignUpPage extends StatelessWidget {
   }
 }
 
-class SignUpForm extends StatelessWidget {
+class SignUpForm extends StatefulWidget {
   const SignUpForm({Key key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final TextEditingController _name = TextEditingController();
-    final TextEditingController _email = TextEditingController();
-    final TextEditingController _password = TextEditingController();
-    final TextEditingController _confirmation = TextEditingController();
-    final FocusNode _focusName = FocusNode();
-    final FocusNode _focusEmail = FocusNode();
-    final FocusNode _focusPassword = FocusNode();
-    final FocusNode _focusConfirmation = FocusNode();
+  _SignUpFormState createState() => _SignUpFormState();
+}
 
+class _SignUpFormState extends State<SignUpForm> {
+  TextEditingController _name;
+  TextEditingController _email;
+  TextEditingController _password;
+  TextEditingController _confirmation;
+  FocusNode _focusName;
+  FocusNode _focusEmail;
+  FocusNode _focusPassword;
+  FocusNode _focusConfirmation;
+
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    _name = TextEditingController();
+    _email = TextEditingController();
+    _password = TextEditingController();
+    _confirmation = TextEditingController();
+    _focusName = FocusNode();
+    _focusEmail = FocusNode();
+    _focusPassword = FocusNode();
+    _focusConfirmation = FocusNode();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final provider = Provider.of<SignUpProvider>(context);
 
     return Form(
+      key: _formKey,
       child: Column(
         children: <Widget>[
           TextField(
             controller: _name,
-            obscureText: false,
             textInputAction: TextInputAction.next,
-            onSubmitted: (_) =>
+            onEditingComplete: () =>
                 FocusScope.of(context).requestFocus(_focusEmail),
             focusNode: _focusName,
             decoration: InputDecoration(
@@ -169,7 +188,71 @@ class SignUpForm extends StatelessWidget {
                 ),
                 onPressed: () async {
                   FocusScope.of(context).requestFocus(FocusNode());
-                  Either<Failure, FirebaseUser> result =
+                  if (_name.text.length < 3) {
+                    showDialog(
+                      context: context,
+                      child: AlertDialog(
+                        title: Text('Oops 😯'),
+                        content: Text('You forgot to enter your name.'),
+                        actions: <Widget>[
+                          FlatButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Text('Ok'),
+                          ),
+                        ],
+                      ),
+                    );
+
+                    return;
+                  } else if (_email.text.length == 0) {
+                    showDialog(
+                      context: context,
+                      child: AlertDialog(
+                        title: Text('Oops 😯'),
+                        content: Text("You forgot to enter your email."),
+                        actions: <Widget>[
+                          FlatButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Text('Ok'),
+                          ),
+                        ],
+                      ),
+                    );
+                    return;
+                  } else if (_password.text.length == 0) {
+                    showDialog(
+                      context: context,
+                      child: AlertDialog(
+                        title: Text('Oops 😯'),
+                        content: Text("You forgot to enter your password."),
+                        actions: <Widget>[
+                          FlatButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Text('Ok'),
+                          ),
+                        ],
+                      ),
+                    );
+                    return;
+                  } else if (_confirmation.text != _password.text) {
+                    showDialog(
+                      context: context,
+                      child: AlertDialog(
+                        title: Text('Oops 😯'),
+                        content: Text(
+                            "Your password and the confirmation don't match."),
+                        actions: <Widget>[
+                          FlatButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Text('Ok'),
+                          ),
+                        ],
+                      ),
+                    );
+
+                    return;
+                  }
+                  dartz.Either<Failure, FirebaseUser> result =
                       await provider.createUser(
                     name: _name.text,
                     email: _email.text,
@@ -181,7 +264,7 @@ class SignUpForm extends StatelessWidget {
                       context: context,
                       child: AlertDialog(
                         title: Text('Error 😯'),
-                        content: Text(error.mensage),
+                        content: Text('${error.mensage}'),
                         actions: <Widget>[
                           FlatButton(
                             onPressed: () => Navigator.of(context).pop(),

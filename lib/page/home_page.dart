@@ -79,6 +79,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                               children: <Widget>[
                                                 Icon(
                                                   Icons.info_outline,
+                                                  color: Theme.of(context)
+                                                      .accentColor,
                                                   size: 40.0,
                                                 ),
                                                 SizedBox(height: 10.0),
@@ -141,7 +143,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       alignment: Alignment.topCenter,
                       child: StreamBuilder(
                         stream: FirebaseAuth.instance.currentUser().asStream(),
-                        builder: (context, snapshot) => snapshot.hasData
+                        builder: (context, snapshot) => snapshot.hasData &&
+                                snapshot.data != null
                             ? Column(
                                 children: <Widget>[
                                   TaskAppBar(
@@ -158,7 +161,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   ),
                                 ],
                               )
-                            : null,
+                            : Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Theme.of(context).primaryColor),
+                                    ),
+                                  ],
+                                ),
+                              ),
                       ),
                     ),
                   ],

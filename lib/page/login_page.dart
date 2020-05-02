@@ -1,4 +1,4 @@
-import 'package:dartz/dartz.dart';
+import 'package:dartz/dartz.dart' as dartz;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -44,7 +44,7 @@ class LoginPage extends StatelessWidget {
   }
 }
 
-class LoginForm extends StatelessWidget {
+class LoginForm extends StatefulWidget {
   const LoginForm({
     Key key,
     @required FocusNode focusPassword,
@@ -57,10 +57,15 @@ class LoginForm extends StatelessWidget {
   final FocusNode _focusEmail;
 
   @override
-  Widget build(BuildContext context) {
-    final TextEditingController _email = TextEditingController();
-    final TextEditingController _password = TextEditingController();
+  _LoginFormState createState() => _LoginFormState();
+}
 
+class _LoginFormState extends State<LoginForm> {
+  final TextEditingController _email = TextEditingController();
+  final TextEditingController _password = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
     final state = Provider.of<LoginProvider>(context);
 
     return Form(
@@ -71,8 +76,8 @@ class LoginForm extends StatelessWidget {
             obscureText: false,
             textInputAction: TextInputAction.next,
             onSubmitted: (_) =>
-                FocusScope.of(context).requestFocus(_focusPassword),
-            focusNode: _focusEmail,
+                FocusScope.of(context).requestFocus(widget._focusPassword),
+            focusNode: widget._focusEmail,
             decoration: InputDecoration(
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
@@ -91,7 +96,7 @@ class LoginForm extends StatelessWidget {
             controller: _password,
             obscureText: true,
             onSubmitted: (_) => FocusScope.of(context).unfocus(),
-            focusNode: _focusPassword,
+            focusNode: widget._focusPassword,
             decoration: InputDecoration(
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
@@ -133,7 +138,40 @@ class LoginForm extends StatelessWidget {
                 ),
                 onPressed: () async {
                   FocusScope.of(context).requestFocus(FocusNode());
-                  Either<Failure, FirebaseUser> result =
+
+                  if (_email.text.length == 0) {
+                    showDialog(
+                      context: context,
+                      child: AlertDialog(
+                        title: Text('Oops 😯'),
+                        content: Text("You forgot to enter your email."),
+                        actions: <Widget>[
+                          FlatButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Text('Ok'),
+                          ),
+                        ],
+                      ),
+                    );
+                    return;
+                  } else if (_password.text.length == 0) {
+                    showDialog(
+                      context: context,
+                      child: AlertDialog(
+                        title: Text('Oops 😯'),
+                        content: Text("You forgot to enter your password."),
+                        actions: <Widget>[
+                          FlatButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Text('Ok'),
+                          ),
+                        ],
+                      ),
+                    );
+                    return;
+                  }
+
+                  dartz.Either<Failure, FirebaseUser> result =
                       await state.authenticateUser(_email.text, _password.text);
                   result.fold(
                     (error) => showDialog(

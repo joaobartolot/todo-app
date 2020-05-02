@@ -60,7 +60,7 @@ class ProfileMenu extends StatelessWidget {
               onTap: () {
                 UserHelper.setUserUid('');
                 FirebaseAuth.instance.signOut();
-                Navigator.pushReplacementNamed(context, '/login');
+                Navigator.pushReplacementNamed(context, '/login-signup');
               },
               child: Row(
                 children: <Widget>[
