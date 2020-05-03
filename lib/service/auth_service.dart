@@ -1,6 +1,5 @@
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:todo_firebase/helper/user_helper.dart';
 import 'package:todo_firebase/util/failure.dart';
 
 class AuthService {
@@ -18,7 +17,6 @@ class AuthService {
       return Left(Failure(error: e.code, mensage: e.message));
     }
 
-    UserHelper.setUserUid(result.user.uid);
     return Right(result.user);
   }
 
@@ -40,7 +38,6 @@ class AuthService {
 
     result.user.updateProfile(profileUpdates);
 
-    UserHelper.setUserUid(result.user.uid);
     return Right(result.user);
   }
 }

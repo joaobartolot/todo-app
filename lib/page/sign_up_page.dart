@@ -59,6 +59,8 @@ class _SignUpFormState extends State<SignUpForm> {
     _focusEmail = FocusNode();
     _focusPassword = FocusNode();
     _focusConfirmation = FocusNode();
+
+    super.initState();
   }
 
   @override

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:todo_firebase/helper/user_helper.dart';
 import 'package:todo_firebase/model/task_model.dart';
 import 'package:todo_firebase/service/task_service.dart';
 
@@ -64,7 +64,7 @@ class HomeProvider with ChangeNotifier {
   }
 
   Future<Stream<QuerySnapshot>> taskList() async {
-    var uid = await UserHelper.getUserUid();
-    return Firestore.instance.collection('user/$uid/tasks').snapshots();
+    var user = await FirebaseAuth.instance.currentUser();
+    return Firestore.instance.collection('user/${user.uid}/tasks').snapshots();
   }
 }

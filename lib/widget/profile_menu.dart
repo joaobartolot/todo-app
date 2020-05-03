@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:todo_firebase/helper/user_helper.dart';
 
 class ProfileMenu extends StatelessWidget {
   final String name;
@@ -58,7 +57,6 @@ class ProfileMenu extends StatelessWidget {
             // SizedBox(height: 15.0),
             GestureDetector(
               onTap: () {
-                UserHelper.setUserUid('');
                 FirebaseAuth.instance.signOut();
                 Navigator.pushReplacementNamed(context, '/login-signup');
               },

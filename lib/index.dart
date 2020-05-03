@@ -1,5 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:todo_firebase/helper/user_helper.dart';
 
 class Index extends StatefulWidget {
   Index({Key key}) : super(key: key);
@@ -12,15 +12,11 @@ class _IndexState extends State<Index> {
   @override
   void initState() {
     super.initState();
-
-    UserHelper.userIsLogged().then(
-      (isLogged) {
-        if (isLogged) {
-          Navigator.pushReplacementNamed(context, '/home');
-        } else
-          Navigator.pushReplacementNamed(context, '/login-signup');
-      },
-    );
+    FirebaseAuth.instance.currentUser().then(
+          (user) => user == null
+              ? Navigator.pushReplacementNamed(context, '/login-signup')
+              : Navigator.pushReplacementNamed(context, '/home'),
+        );
   }
 
   @override

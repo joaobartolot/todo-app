@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:todo_firebase/helper/user_helper.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class TaskService {
   CollectionReference taskCollection;
@@ -7,9 +7,9 @@ class TaskService {
   String userUid;
 
   TaskService() {
-    UserHelper.getUserUid().then(
-      (value) {
-        userUid = value;
+    FirebaseAuth.instance.currentUser().then(
+      (user) {
+        userUid = user.uid;
         taskCollection = Firestore.instance.collection('user/$userUid/tasks');
       },
     );
