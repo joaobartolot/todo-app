@@ -10,7 +10,6 @@ class HomeProvider with ChangeNotifier {
   bool _isCollapsed = true;
   bool get isCollapsed => _isCollapsed;
   set isCollapsed(bool value) {
-    print(value);
     _isCollapsed = value;
     notifyListeners();
   }

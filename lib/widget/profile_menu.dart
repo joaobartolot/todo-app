@@ -40,21 +40,21 @@ class ProfileMenu extends StatelessWidget {
               ),
             ),
             SizedBox(height: 25.0),
-            // GestureDetector(
-            //   onTap: () => print('implement'),
-            //   child: Row(
-            //     children: <Widget>[
-            //       Icon(
-            //         FontAwesomeIcons.addressCard,
-            //         color: Theme.of(context).accentColor,
-            //         size: 18.0,
-            //       ),
-            //       SizedBox(width: 15.0),
-            //       Text('Profile'),
-            //     ],
-            //   ),
-            // ),
-            // SizedBox(height: 15.0),
+            GestureDetector(
+              onTap: () => Navigator.pushNamed(context, '/profile'),
+              child: Row(
+                children: <Widget>[
+                  Icon(
+                    FontAwesomeIcons.addressCard,
+                    color: Theme.of(context).accentColor,
+                    size: 18.0,
+                  ),
+                  SizedBox(width: 15.0),
+                  Text('Profile'),
+                ],
+              ),
+            ),
+            SizedBox(height: 15.0),
             GestureDetector(
               onTap: () {
                 FirebaseAuth.instance.signOut();

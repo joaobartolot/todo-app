@@ -148,7 +148,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     alignment: Alignment.topCenter,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                      child: StreamBuilder(
+                      child: StreamBuilder<FirebaseUser>(
                         stream: FirebaseAuth.instance.currentUser().asStream(),
                         builder: (context, snapshot) => snapshot.hasData &&
                                 snapshot.data != null
@@ -156,7 +156,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 children: <Widget>[
                                   TaskAppBar(
                                     controller: _controller,
-                                    photoUrl: '',
+                                    photoUrl: snapshot.data.photoUrl,
                                     name: snapshot.data.displayName,
                                   ),
                                   SizeTransition(

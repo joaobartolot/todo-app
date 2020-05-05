@@ -3,6 +3,7 @@ import 'package:todo_firebase/index.dart';
 import 'package:todo_firebase/page/home_page.dart';
 import 'package:todo_firebase/page/login_page.dart';
 import 'package:todo_firebase/page/login_signup_page.dart';
+import 'package:todo_firebase/page/profile_page.dart';
 import 'package:todo_firebase/page/sign_up_page.dart';
 
 void main() => runApp(MyApp());
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginPage(),
         '/signup': (context) => SignUpPage(),
         '/home': (context) => HomePage(),
+        '/profile': (context) => ProfilePage(),
       },
     );
   }
