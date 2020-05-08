@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_firebase/model/task_model.dart';
 import 'package:todo_firebase/provider/home_provider.dart';
+import 'package:todo_firebase/provider/item_task_provider.dart';
 import 'package:todo_firebase/widget/profile_menu.dart';
 import 'package:todo_firebase/widget/task_app_bar.dart';
 
@@ -50,11 +52,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           NewTask(),
                           Expanded(
                             flex: 1,
-                            child: FutureBuilder(
-                              future: provider.taskList(),
-                              builder: (context, stream) => stream.hasData
-                                  ? StreamBuilder(
-                                      stream: stream.data,
+                            child: StreamBuilder<FirebaseUser>(
+                              stream: FirebaseAuth.instance
+                                  .currentUser()
+                                  .asStream(),
+                              builder: (context, user) => user.hasData
+                                  ? StreamBuilder<QuerySnapshot>(
+                                      stream: provider.getTasks(user.data.uid),
                                       builder: (context, snapshot) {
                                         if (!snapshot.hasData)
                                           return Center(
@@ -74,7 +78,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                           );
 
                                         var taskList = snapshot.data.documents;
-                                        if (snapshot.data.documents.length == 0)
+                                        if (taskList.length == 0)
                                           return Center(
                                             child: Padding(
                                               padding: EdgeInsets.only(
@@ -105,39 +109,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         return ListView.builder(
                                           itemCount: taskList.length,
                                           itemBuilder: (context, index) =>
-                                              Container(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width -
-                                                60.0,
-                                            child: Row(
-                                              children: <Widget>[
-                                                Checkbox(
-                                                  value: taskList[index]
-                                                      .data['isDone'],
-                                                  onChanged: (value) {
-                                                    print('implement');
-                                                    // provider.toggleTodo(
-                                                    //     taskList[index].data);
-                                                  },
-                                                ),
-                                                Text(
-                                                  taskList[index].data['text'],
-                                                  style: taskList[index]
-                                                          .data['isDone']
-                                                      ? TextStyle(
-                                                          decoration:
-                                                              TextDecoration
-                                                                  .lineThrough)
-                                                      : null,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
+                                              ItemTask(item: taskList[index]),
                                         );
                                       },
                                     )
-                                  : null,
+                                  : CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Theme.of(context).primaryColor),
+                                    ),
                             ),
                           ),
                         ],
@@ -192,6 +171,60 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 }
 
+class ItemTask extends StatelessWidget {
+  const ItemTask({
+    Key key,
+    @required this.item,
+  }) : super(key: key);
+
+  final DocumentSnapshot item;
+
+  @override
+  Widget build(BuildContext context) {
+    final home_provider = Provider.of<HomeProvider>(context);
+    return ChangeNotifierProvider(
+      create: (context) => ItemTaskProvider(),
+      child: Consumer<ItemTaskProvider>(
+        builder: (context, provider, _) => InkWell(
+          onTap: () => home_provider.toggleTodo(
+            item.documentID,
+            !item.data['is_complete'],
+          ),
+          onLongPress: () => provider.isEditing = !provider.isEditing,
+          child: Container(
+            width: MediaQuery.of(context).size.width - 60.0,
+            child: Row(
+              children: <Widget>[
+                Checkbox(
+                  value: item.data['is_complete'],
+                  onChanged: (value) {
+                    home_provider.toggleTodo(
+                      item.documentID,
+                      !item.data['is_complete'],
+                    );
+                  },
+                  activeColor: Theme.of(context).primaryColor,
+                ),
+                Text(
+                  item.data['text'],
+                  style: item.data['is_complete']
+                      ? TextStyle(decoration: TextDecoration.lineThrough)
+                      : null,
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child:
+                      provider.isEditing ? Icon(Icons.more_horiz) : Container(),
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class NewTask extends StatelessWidget {
   const NewTask({
     Key key,
@@ -200,50 +233,46 @@ class NewTask extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<HomeProvider>(context);
-    return Opacity(
-      opacity: provider.isAdding ? 1.0 : 0.0,
-      child: Container(
-        height: provider.isAdding ? 40.0 : 0.0,
-        width: MediaQuery.of(context).size.width - 60,
-        child: Flex(
-          direction: Axis.horizontal,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Checkbox(
-              value: provider.newTaskChecked,
-              onChanged: (value) => provider.newTaskChecked = value,
-              activeColor: Theme.of(context).primaryColor,
-            ),
-            Expanded(
-              flex: 1,
-              child: TextField(
-                decoration: InputDecoration(
-                  isDense: true,
-                  contentPadding: EdgeInsets.symmetric(
-                    vertical: 5.0,
-                  ),
-                ),
-                onChanged: (value) => provider.newTaskText = value,
+    return StreamBuilder<FirebaseUser>(
+      stream: FirebaseAuth.instance.currentUser().asStream(),
+      builder: (context, snapshot) => Opacity(
+        opacity: provider.isAdding ? 1.0 : 0.0,
+        child: Container(
+          height: provider.isAdding ? 40.0 : 0.0,
+          width: MediaQuery.of(context).size.width - 60,
+          child: Flex(
+            direction: Axis.horizontal,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Checkbox(
+                value: provider.newTaskChecked,
+                onChanged: (value) => provider.newTaskChecked = value,
+                activeColor: Theme.of(context).primaryColor,
               ),
-            ),
-            IconButton(
-              icon: Icon(Icons.check),
-              color: Theme.of(context).primaryColor,
-              onPressed: () {
-                print('save');
-                FocusScope.of(context).requestFocus(FocusNode());
-                provider.addTask(
-                  TaskModel(
-                    isDone: provider.newTaskChecked,
-                    text: provider.newTaskText,
+              Expanded(
+                flex: 1,
+                child: TextField(
+                  decoration: InputDecoration(
+                    isDense: true,
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 5.0,
+                    ),
                   ),
-                );
-                provider.newTaskChecked = false;
-                provider.newTaskText = '';
-                provider.isAdding = false;
-              },
-            )
-          ],
+                  onChanged: (value) => provider.newTaskText = value,
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.check),
+                color: Theme.of(context).primaryColor,
+                onPressed: () {
+                  print('save');
+                  FocusScope.of(context).requestFocus(FocusNode());
+
+                  provider.addTask(snapshot.data.uid);
+                },
+              )
+            ],
+          ),
         ),
       ),
     );

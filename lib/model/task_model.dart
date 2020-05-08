@@ -1,6 +1,6 @@
 class TaskModel {
-  bool isDone;
+  bool is_complete;
   String text;
 
-  TaskModel({this.isDone, this.text});
+  TaskModel({this.is_complete, this.text});
 }

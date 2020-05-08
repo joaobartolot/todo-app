@@ -28,13 +28,14 @@ class ProfileProvider with ChangeNotifier {
   }
 
   Future<void> saveChanges() async {
+    isEditing = false;
+
     if (image != null) {
       await _saveImage();
     }
 
     _updateProfile();
 
-    isEditing = false;
     image = null;
   }
 

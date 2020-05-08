@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -65,22 +63,25 @@ class _ProfilePageState extends State<ProfilePage> {
                                             Consumer<ProfileProvider>(
                                               builder: (context, provider, _) =>
                                                   provider.image == null
-                                                      ? ProfilePhoto(
-                                                          name: snapshot
-                                                              .data.displayName,
-                                                          photoUrl: provider
-                                                                  .uploadedFileURL ??
-                                                              snapshot.data
-                                                                  .photoUrl,
-                                                          radio: 100.0,
+                                                      ? Hero(
+                                                          tag: 'profile-photo',
+                                                          child: ProfilePhoto(
+                                                            name: snapshot.data
+                                                                .displayName,
+                                                            photoUrl: provider
+                                                                    .uploadedFileURL ??
+                                                                snapshot.data
+                                                                    .photoUrl,
+                                                            radio: 100.0,
+                                                          ),
                                                         )
                                                       : ClipRRect(
                                                           borderRadius:
                                                               BorderRadius
                                                                   .circular(
                                                                       50.0),
-                                                          child: Image.asset(
-                                                            provider.image.path,
+                                                          child: Image.file(
+                                                            provider.image,
                                                             fit: BoxFit.cover,
                                                             height: 100,
                                                             width: 100,
@@ -162,22 +163,31 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                               Column(
                                 children: <Widget>[
+                                  // Align(
+                                  //   alignment: Alignment.bottomCenter,
+                                  //   child: Text(
+                                  //     'Delete account',
+                                  //     style: TextStyle(
+                                  //       color: Colors.red,
+                                  //       fontSize: 16.0,
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                  // SizedBox(height: 5.0),
                                   Align(
                                     alignment: Alignment.bottomCenter,
-                                    child: Text(
-                                      'Delete account',
-                                      style: TextStyle(
-                                        color: Colors.red,
-                                        fontSize: 16.0,
+                                    child: InkWell(
+                                      onTap: () => FirebaseAuth.instance
+                                          .signOut()
+                                          .then((val) => Navigator.of(context)
+                                              .pushNamedAndRemoveUntil(
+                                                  '/login-signup',
+                                                  (Route<dynamic> route) =>
+                                                      false)),
+                                      child: Text(
+                                        'Signout',
+                                        style: TextStyle(fontSize: 16.0),
                                       ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 5.0),
-                                  Align(
-                                    alignment: Alignment.bottomCenter,
-                                    child: Text(
-                                      'Signout',
-                                      style: TextStyle(fontSize: 16.0),
                                     ),
                                   ),
                                   SizedBox(height: 30.0)

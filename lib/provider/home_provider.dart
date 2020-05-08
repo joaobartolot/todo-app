@@ -22,8 +22,8 @@ class HomeProvider with ChangeNotifier {
   }
 
   List<TaskModel> _tasks = <TaskModel>[
-    TaskModel(isDone: true, text: 'Buy somethings'),
-    TaskModel(isDone: false, text: 'Do the homework')
+    TaskModel(is_complete: true, text: 'Buy somethings'),
+    TaskModel(is_complete: false, text: 'Do the homework')
   ];
   List<TaskModel> get tasks => _tasks;
   set tasks(List<TaskModel> value) {
@@ -31,16 +31,11 @@ class HomeProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void addTask(TaskModel task) {
-    tasks.insert(0, task);
-    _taskService.addTask(task.isDone, task.text);
-    notifyListeners();
-  }
-
-  void toggleTodo(TaskModel task) {
-    final taskIndex = _tasks.indexOf(task);
-    _tasks[taskIndex].isDone = !_tasks[taskIndex].isDone;
-    notifyListeners();
+  void toggleTodo(String taskId, bool value) {
+    Firestore.instance
+        .collection('task')
+        .document(taskId)
+        .updateData({'is_complete': value});
   }
 
   void animateProfileMenu(AnimationController controller) {
@@ -60,6 +55,28 @@ class HomeProvider with ChangeNotifier {
   set newTaskText(String value) {
     _newTaskText = value;
     notifyListeners();
+  }
+
+  Stream<QuerySnapshot> getTasks(String uid) {
+    return Firestore.instance
+        .collection('task')
+        .where('user', isEqualTo: uid)
+        .orderBy('date_creation')
+        .snapshots();
+  }
+
+  void addTask(String uid) {
+    Firestore.instance.collection('task').add(
+      {
+        'user': uid,
+        'is_complete': newTaskChecked,
+        'text': newTaskText,
+        'date_creation': DateTime.now(),
+      },
+    );
+    newTaskChecked = false;
+    newTaskText = '';
+    isAdding = false;
   }
 
   Future<Stream<QuerySnapshot>> taskList() async {

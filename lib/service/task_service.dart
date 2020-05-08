@@ -15,8 +15,8 @@ class TaskService {
     );
   }
 
-  Future<void> addTask(bool isDone, String text) async {
-    return await taskCollection.add({'isDone': isDone, 'text': text});
+  Future<void> addTask(bool is_complete, String text) async {
+    return await taskCollection.add({'is_complete': is_complete, 'text': text});
   }
 
   Stream<QuerySnapshot> getTaskList() {

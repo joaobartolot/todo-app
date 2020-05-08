@@ -27,7 +27,9 @@ class TaskAppBar extends StatelessWidget {
         children: <Widget>[
           GestureDetector(
             onTap: () => provider.animateProfileMenu(controller),
-            child: ProfilePhoto(photoUrl: photoUrl, name: name),
+            child: Hero(
+                tag: 'profile-photo',
+                child: ProfilePhoto(photoUrl: photoUrl, name: name)),
           ),
           Text(
             'Your tasks',

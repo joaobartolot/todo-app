@@ -2,9 +2,4 @@
 <!-- Modify this file to customize your launch splash screen -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@color/DarkBlue" />
-
-    <!-- You can insert your own image assets here -->
-    <item android:gravity="center" android:width="75dp" android:height="75dp">
-        <bitmap android:gravity="center" android:src="@drawable/init_icon" />
-    </item>
 </layer-list>
